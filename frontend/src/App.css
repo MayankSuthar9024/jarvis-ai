@@ -1,0 +1,38 @@
+.app-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.blur-box {
+  background: rgba(10, 12, 16, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 8px 32px 0 rgba(0, 240, 255, 0.1), inset 0 0 20px rgba(0, 240, 255, 0.05);
+  color: #e2e8f0;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.blur-box h2 {
+  color: #00f0ff;
+  font-size: 2rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  letter-spacing: 2px;
+}
+
+.blur-box p {
+  color: #94a3b8;
+  font-size: 1.1rem;
+  margin: 0;
+}
