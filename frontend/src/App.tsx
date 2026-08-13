@@ -1,11 +1,12 @@
-import './App.css'
+import { JarvisBlobUI } from './components/JarvisBlobUI';
+import './App.css';
 
 function App() {
   return (
     <div className="app-container">
-      {/* Empty container, showing only the background */}
+      <JarvisBlobUI />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
