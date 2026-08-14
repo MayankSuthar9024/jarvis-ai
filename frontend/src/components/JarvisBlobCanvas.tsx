@@ -55,16 +55,13 @@ export const JarvisBlobCanvas: React.FC<JarvisBlobCanvasProps> = ({ state, audio
 
     // ---- USER'S EXACT BLOB CODE ----
     const twoPi = Math.PI * 2;
-    const blobSize = Math.min(
-      canvas.parentElement?.clientWidth || window.innerWidth,
-      canvas.parentElement?.clientHeight || window.innerHeight
-    ) * 0.5;
+    const sizeObj = {
+      windowWidth: 800,
+      windowHeight: 800,
+    };
+    const blobSize = 800 * 0.5;
     let dotSize = blobSize * 0.7;
     let minDotSize = dotSize - (dotSize * 0.2);
-    const sizeObj = {
-      windowWidth: canvas.parentElement?.clientWidth || window.innerWidth,
-      windowHeight: canvas.parentElement?.clientHeight || window.innerHeight,
-    };
 
     canvas.width = sizeObj.windowWidth;
     canvas.height = sizeObj.windowHeight;
@@ -169,22 +166,9 @@ export const JarvisBlobCanvas: React.FC<JarvisBlobCanvasProps> = ({ state, audio
       ctx!.restore();
     }
 
-    const handleResize = () => {
-      gsap.set(sizeObj, {
-        windowWidth: canvas!.parentElement?.clientWidth || window.innerWidth,
-        windowHeight: canvas!.parentElement?.clientHeight || window.innerHeight,
-      });
-      canvas!.width = sizeObj.windowWidth;
-      canvas!.height = sizeObj.windowHeight;
-      dotSize = sizeObj.windowWidth / 30;
-    };
-
-    window.addEventListener('resize', handleResize);
-    handleResize();
     gsap.ticker.add(draw);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
       gsap.ticker.remove(draw);
       tweens.forEach(t => t.kill());
     };
