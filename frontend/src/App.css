@@ -37,7 +37,7 @@
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.jarvis-container:hover {
+.jarvis-container:not(.disable-hover):hover {
   max-width: 900px;
   height: 90vh;
   max-height: 850px;
@@ -175,7 +175,7 @@
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.jarvis-container:hover .jarvis-blob-wrapper {
+.jarvis-container:not(.disable-hover):hover .jarvis-blob-wrapper {
   min-height: 280px;
 }
 
@@ -218,7 +218,7 @@
   transform-origin: bottom;
 }
 
-.jarvis-container:hover .spectrum-bar {
+.jarvis-container:not(.disable-hover):hover .spectrum-bar {
   transform: scaleY(1.3) scaleX(1.5);
   filter: hue-rotate(120deg) brightness(1.2);
 }

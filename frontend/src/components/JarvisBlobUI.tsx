@@ -2,7 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { JarvisBlobCanvas } from './JarvisBlobCanvas';
 import { JarvisVoiceController, type AssistantState } from '../utils/JarvisVoiceController';
 
-export const JarvisBlobUI: React.FC = () => {
+export interface JarvisBlobUIProps {
+  settings?: {
+    showBlob: boolean;
+    hoverEnabled: boolean;
+    equalizerEnabled: boolean;
+  };
+}
+
+export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({ settings }) => {
   const [state, setState] = useState<AssistantState>('IDLE');
   const [audioLevel, setAudioLevel] = useState<number>(0);
   const [transcript, setTranscript] = useState<string>('');
@@ -67,27 +75,36 @@ export const JarvisBlobUI: React.FC = () => {
   };
 
   return (
-    <div className="jarvis-container" style={{ cursor: 'pointer' }} onClick={handleMicToggle} title={state === 'LISTENING' ? 'Stop Listening' : 'Click to Speak'}>
+    <div 
+      className={`jarvis-container ${settings?.hoverEnabled !== false ? '' : 'disable-hover'}`} 
+      style={{ cursor: 'pointer' }} 
+      onClick={handleMicToggle} 
+      title={state === 'LISTENING' ? 'Stop Listening' : 'Click to Speak'}
+    >
       {/* Center Blob Container with Circular Background Sampling */}
       <main className="jarvis-blob-wrapper" style={{ height: '100%' }}>
-        <JarvisBlobCanvas state={state} audioLevel={audioLevel} />
+        {settings?.showBlob !== false && (
+          <JarvisBlobCanvas state={state} audioLevel={audioLevel} />
+        )}
 
         {/* Dynamic Spectrum Wave Equalizer overlay */}
-        <div className="spectrum-bar-container">
-          {[0.4, 0.7, 1.0, 0.6, 0.8, 0.5, 0.9, 0.7, 0.4].map((multiplier, idx) => {
-            const barHeight = Math.max(8, audioLevel * 70 * multiplier + Math.sin(idx + Date.now() * 0.005) * 4);
-            return (
-              <div
-                key={idx}
-                className="spectrum-bar"
-                style={{
-                  height: `${barHeight}px`,
-                  opacity: state === 'IDLE' ? 0.3 : 0.9,
-                }}
-              />
-            );
-          })}
-        </div>
+        {settings?.equalizerEnabled !== false && (
+          <div className="spectrum-bar-container">
+            {[0.4, 0.7, 1.0, 0.6, 0.8, 0.5, 0.9, 0.7, 0.4].map((multiplier, idx) => {
+              const barHeight = Math.max(8, audioLevel * 70 * multiplier + Math.sin(idx + Date.now() * 0.005) * 4);
+              return (
+                <div
+                  key={idx}
+                  className="spectrum-bar"
+                  style={{
+                    height: `${barHeight}px`,
+                    opacity: state === 'IDLE' ? 0.3 : 0.9,
+                  }}
+                />
+              );
+            })}
+          </div>
+        )}
       </main>
     </div>
   );
