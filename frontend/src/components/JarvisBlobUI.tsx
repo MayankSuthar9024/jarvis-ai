@@ -75,14 +75,22 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({ settings }) => {
   };
 
   return (
-    <div 
-      className={`jarvis-container ${settings?.hoverEnabled !== false ? '' : 'disable-hover'}`} 
-      style={{ cursor: 'pointer' }} 
-      onClick={handleMicToggle} 
+    <div
+      className={`jarvis-container ${settings?.hoverEnabled !== false ? '' : 'disable-hover'}`}
+      style={{ cursor: 'pointer' }}
+      onClick={handleMicToggle}
       title={state === 'LISTENING' ? 'Stop Listening' : 'Click to Speak'}
     >
       {/* Center Blob Container with Circular Background Sampling */}
       <main className="jarvis-blob-wrapper" style={{ height: '100%' }}>
+        {/* State Badge Overlay */}
+        <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 20 }} onClick={(e) => e.stopPropagation()}>
+          <div className={`status-badge ${getStateBadgeClass()}`}>
+            <span className="pulse-indicator" />
+            {state}
+          </div>
+        </div>
+
         {settings?.showBlob !== false && (
           <JarvisBlobCanvas state={state} audioLevel={audioLevel} />
         )}
@@ -91,14 +99,17 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({ settings }) => {
         {settings?.equalizerEnabled !== false && (
           <div className="spectrum-bar-container">
             {[0.4, 0.7, 1.0, 0.6, 0.8, 0.5, 0.9, 0.7, 0.4].map((multiplier, idx) => {
-              const barHeight = Math.max(8, audioLevel * 70 * multiplier + Math.sin(idx + Date.now() * 0.005) * 4);
+              const isVoiceActive = state === 'LISTENING' || state === 'SPEAKING';
+              const effectiveLevel = isVoiceActive ? Math.max(audioLevel, 0.25) : audioLevel;
+              const wave = Math.sin(idx * 0.8 + Date.now() * 0.008) * (isVoiceActive ? 14 : 4);
+              const barHeight = Math.max(8, effectiveLevel * 75 * multiplier + 12 + wave);
               return (
                 <div
                   key={idx}
                   className="spectrum-bar"
                   style={{
                     height: `${barHeight}px`,
-                    opacity: state === 'IDLE' ? 0.3 : 0.9,
+                    opacity: state === 'IDLE' ? 0.35 : 0.95,
                   }}
                 />
               );
@@ -106,6 +117,41 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({ settings }) => {
           </div>
         )}
       </main>
+
+      {/* Bottom Interactive Controls (Mic Button, Text Input, Dialogue Display) */}
+      <section className="jarvis-controls-section" onClick={(e) => e.stopPropagation()}>
+        <div className="response-card">
+          {transcript && (
+            <div className="user-speech">
+              <span className="speech-label">YOU:</span> {transcript}
+            </div>
+          )}
+          <div className="jarvis-speech">
+            <span className="speech-label">JARVIS:</span> {lastResponse}
+          </div>
+        </div>
+
+        <div className="controls-bar">
+          <button
+            className={`mic-button ${state === 'LISTENING' ? 'active' : ''}`}
+            onClick={handleMicToggle}
+            title={state === 'LISTENING' ? 'Stop Listening' : 'Start Listening'}
+          >
+            🎤
+          </button>
+
+          <form className="input-form" onSubmit={handleTextSubmit}>
+            <input
+              type="text"
+              className="text-input"
+              placeholder="Ask Jarvis anything..."
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+            />
+            <button type="submit" className="send-button">Send</button>
+          </form>
+        </div>
+      </section>
     </div>
   );
 };

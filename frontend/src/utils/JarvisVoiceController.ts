@@ -33,11 +33,14 @@ export class JarvisVoiceController {
 
     if (SpeechRecognition) {
       this.recognition = new SpeechRecognition();
-      this.recognition.continuous = false;
+      this.recognition.continuous = true;
       this.recognition.interimResults = true;
       this.recognition.lang = 'en-US';
 
+      let capturedText = '';
+
       this.recognition.onstart = () => {
+        capturedText = '';
         this.setState('LISTENING');
       };
 
@@ -46,31 +49,61 @@ export class JarvisVoiceController {
         let finalTranscript = '';
 
         for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
+          const item = event.results[i];
+          if (item.isFinal) {
+            finalTranscript += item[0].transcript;
           } else {
-            interimTranscript += event.results[i][0].transcript;
+            interimTranscript += item[0].transcript;
           }
         }
 
-        const text = finalTranscript || interimTranscript;
-        this.callbacks.onTranscript(text, !!finalTranscript);
+        const text = (finalTranscript || interimTranscript).trim();
+        if (text) {
+          capturedText = text;
+          this.callbacks.onTranscript(text, !!finalTranscript);
+        }
 
-        if (finalTranscript) {
-          this.processUserQuery(finalTranscript);
+        if (finalTranscript.trim()) {
+          const query = finalTranscript.trim();
+          capturedText = '';
+          this.stopListening();
+          this.processUserQuery(query);
         }
       };
 
       this.recognition.onerror = (event: any) => {
         console.warn('Speech recognition error', event.error);
+        if (event.error === 'no-speech') {
+          // Keep listening on silence without dropping back to IDLE immediately
+          return;
+        }
         if (this.state === 'LISTENING') {
-          this.setState('IDLE');
+          if (capturedText.trim()) {
+            const query = capturedText.trim();
+            capturedText = '';
+            this.setState('IDLE');
+            this.processUserQuery(query);
+          } else {
+            this.setState('IDLE');
+          }
         }
       };
 
       this.recognition.onend = () => {
         if (this.state === 'LISTENING') {
-          this.setState('IDLE');
+          if (capturedText.trim()) {
+            const query = capturedText.trim();
+            capturedText = '';
+            this.stopListening();
+            this.processUserQuery(query);
+          } else {
+            // Restart recognition if user is still in LISTENING mode (e.g. ambient pause)
+            try {
+              this.recognition.start();
+            } catch (e) {
+              this.setState('IDLE');
+            }
+          }
         }
       };
     }
@@ -161,19 +194,24 @@ export class JarvisVoiceController {
   }
 
   private loopAudioAnalysis = () => {
-    if (!this.analyser || this.state !== 'LISTENING') return;
-
-    const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-    this.analyser.getByteFrequencyData(dataArray);
-
-    let sum = 0;
-    for (let i = 0; i < dataArray.length; i++) {
-      sum += dataArray[i];
+    if (this.state !== 'LISTENING') {
+      this.callbacks.onAudioLevel(0);
+      return;
     }
-    const avg = sum / dataArray.length;
-    const normalizedLevel = Math.min(1, avg / 128); // 0 to 1
 
-    this.callbacks.onAudioLevel(normalizedLevel);
+    if (this.analyser) {
+      const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+      this.analyser.getByteFrequencyData(dataArray);
+
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) {
+        sum += dataArray[i];
+      }
+      const avg = sum / dataArray.length;
+      const normalizedLevel = Math.min(1, (avg / 64) * 1.5); // Amplified for better orb reaction
+
+      this.callbacks.onAudioLevel(normalizedLevel);
+    }
 
     this.animFrameId = requestAnimationFrame(this.loopAudioAnalysis);
   };

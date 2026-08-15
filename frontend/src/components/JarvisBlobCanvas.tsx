@@ -118,9 +118,23 @@ export const JarvisBlobCanvas: React.FC<JarvisBlobCanvasProps> = ({ state, audio
       const centerX = sizeObj.windowWidth / 2;
       const centerY = sizeObj.windowHeight / 2;
       const currentState = stateRef.current;
+      const level = audioLevelRef.current;
       const baseRadius = Math.min(sizeObj.windowWidth, sizeObj.windowHeight) * 0.25;
-      const breathe = currentState === 'SPEAKING' ? Math.sin(Date.now() * 0.004) * baseRadius * 0.03 : 0;
-      const blobRadius = baseRadius + breathe;
+
+      // Organic ChatGPT-style breathing effect (fluid sinewave breathing + speech audio expansion)
+      const now = Date.now();
+      let breathSin = Math.sin(now * 0.003) * baseRadius * 0.08; // Base smooth breathing oscillation
+      if (currentState === 'LISTENING') {
+        breathSin = Math.sin(now * 0.004) * baseRadius * 0.10 + level * baseRadius * 0.25;
+      } else if (currentState === 'SPEAKING') {
+        breathSin = Math.sin(now * 0.006) * baseRadius * 0.12 + level * baseRadius * 0.30;
+      } else if (currentState === 'THINKING') {
+        breathSin = Math.sin(now * 0.008) * baseRadius * 0.06;
+      } else {
+        breathSin = Math.sin(now * 0.0025) * baseRadius * 0.04;
+      }
+
+      const blobRadius = Math.max(10, baseRadius + breathSin);
 
       ctx!.save();
       ctx!.beginPath();
@@ -151,7 +165,6 @@ export const JarvisBlobCanvas: React.FC<JarvisBlobCanvasProps> = ({ state, audio
       ctx!.save();
       ctx!.beginPath();
       ctx!.arc(centerX, centerY, blobRadius, 0, Math.PI * 2);
-      const level = audioLevelRef.current;
 
       let glowColor = 'rgba(45, 156, 219, 0.4)';
       if (currentState === 'LISTENING') glowColor = 'rgba(0, 240, 255, 0.8)';
