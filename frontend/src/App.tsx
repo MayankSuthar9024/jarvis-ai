@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { JarvisBlobUI } from './components/JarvisBlobUI';
+import { AboutPage } from './components/AboutPage';
 import './App.css';
 
 export interface JarvisSettings {
@@ -8,6 +9,7 @@ export interface JarvisSettings {
 }
 
 function App() {
+  const [currentPage, setCurrentPage] = useState<'home' | 'about'>('home');
   const [showSettings, setShowSettings] = useState(false);
   const [settings, setSettings] = useState<JarvisSettings>({
     hoverEnabled: true,
@@ -22,13 +24,17 @@ function App() {
 
   return (
     <div className="app-container" style={{ position: 'relative' }}>
-      {/* Top Left Header */}
-      <div
-        className="jarvis-header-glass"
-        onClick={(e) => {
-          e.preventDefault();
-          alert('JARVIS AI Assistant. Developed for the best user experience.');
-        }}
+      {currentPage === 'about' ? (
+        <AboutPage onBack={() => setCurrentPage('home')} />
+      ) : (
+        <>
+          {/* Top Left Header */}
+          <div
+            className="jarvis-header-glass"
+            onClick={(e) => {
+              e.preventDefault();
+              setCurrentPage('about');
+            }}
         onMouseMove={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
           const x = e.clientX - rect.left;
@@ -124,6 +130,8 @@ function App() {
       </div>
 
       <JarvisBlobUI settings={settings} />
+        </>
+      )}
     </div>
   );
 }
