@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { JarvisBlobCanvas } from './JarvisBlobCanvas';
 import { JarvisVoiceController, type AssistantState } from '../utils/JarvisVoiceController';
-
 export interface JarvisBlobUIProps {
   settings?: {
     showBlob: boolean;
@@ -82,7 +81,7 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({ settings }) => {
       title={state === 'LISTENING' ? 'Stop Listening' : 'Click to Speak'}
     >
       {/* Center Blob Container with Circular Background Sampling */}
-      <main className="jarvis-blob-wrapper" style={{ height: '100%' }}>
+      <main className="jarvis-blob-wrapper" style={{ height: '100%', position: 'relative' }}>
         {/* State Badge Overlay */}
         <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 20 }} onClick={(e) => e.stopPropagation()}>
           <div className={`status-badge ${getStateBadgeClass()}`}>
@@ -94,15 +93,14 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({ settings }) => {
         {settings?.showBlob !== false && (
           <JarvisBlobCanvas state={state} audioLevel={audioLevel} />
         )}
-
         {/* Dynamic Spectrum Wave Equalizer overlay */}
         {settings?.equalizerEnabled !== false && (
           <div className="spectrum-bar-container">
             {[0.4, 0.7, 1.0, 0.6, 0.8, 0.5, 0.9, 0.7, 0.4].map((multiplier, idx) => {
               const isVoiceActive = state === 'LISTENING' || state === 'SPEAKING';
-              const effectiveLevel = isVoiceActive ? Math.max(audioLevel, 0.25) : audioLevel;
-              const wave = Math.sin(idx * 0.8 + Date.now() * 0.008) * (isVoiceActive ? 14 : 4);
-              const barHeight = Math.max(8, effectiveLevel * 75 * multiplier + 12 + wave);
+              const effectiveLevel = isVoiceActive ? Math.max(audioLevel, 0.1) : audioLevel;
+              const wave = Math.sin(idx * 0.8 + Date.now() * 0.008) * (isVoiceActive ? 4 : 1);
+              const barHeight = Math.max(4, effectiveLevel * 10 * multiplier + 4 + wave);
               return (
                 <div
                   key={idx}
@@ -120,17 +118,6 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({ settings }) => {
 
       {/* Bottom Interactive Controls (Mic Button, Text Input, Dialogue Display) */}
       <section className="jarvis-controls-section" onClick={(e) => e.stopPropagation()}>
-        <div className="response-card">
-          {transcript && (
-            <div className="user-speech">
-              <span className="speech-label">YOU:</span> {transcript}
-            </div>
-          )}
-          <div className="jarvis-speech">
-            <span className="speech-label">JARVIS:</span> {lastResponse}
-          </div>
-        </div>
-
         <div className="controls-bar">
           <button
             className={`mic-button ${state === 'LISTENING' ? 'active' : ''}`}
@@ -152,6 +139,7 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({ settings }) => {
           </form>
         </div>
       </section>
+
     </div>
   );
 };

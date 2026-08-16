@@ -121,20 +121,7 @@ export const JarvisBlobCanvas: React.FC<JarvisBlobCanvasProps> = ({ state, audio
       const level = audioLevelRef.current;
       const baseRadius = Math.min(sizeObj.windowWidth, sizeObj.windowHeight) * 0.25;
 
-      // Organic ChatGPT-style breathing effect (fluid sinewave breathing + speech audio expansion)
-      const now = Date.now();
-      let breathSin = Math.sin(now * 0.003) * baseRadius * 0.08; // Base smooth breathing oscillation
-      if (currentState === 'LISTENING') {
-        breathSin = Math.sin(now * 0.004) * baseRadius * 0.10 + level * baseRadius * 0.25;
-      } else if (currentState === 'SPEAKING') {
-        breathSin = Math.sin(now * 0.006) * baseRadius * 0.12 + level * baseRadius * 0.30;
-      } else if (currentState === 'THINKING') {
-        breathSin = Math.sin(now * 0.008) * baseRadius * 0.06;
-      } else {
-        breathSin = Math.sin(now * 0.0025) * baseRadius * 0.04;
-      }
-
-      const blobRadius = Math.max(10, baseRadius + breathSin);
+      const blobRadius = baseRadius;
 
       ctx!.save();
       ctx!.beginPath();
@@ -162,21 +149,21 @@ export const JarvisBlobCanvas: React.FC<JarvisBlobCanvasProps> = ({ state, audio
       ctx!.restore();
 
       // Outer glow ring around the blob circle
-      ctx!.save();
-      ctx!.beginPath();
-      ctx!.arc(centerX, centerY, blobRadius, 0, Math.PI * 2);
-
-      let glowColor = 'rgba(45, 156, 219, 0.4)';
-      if (currentState === 'LISTENING') glowColor = 'rgba(0, 240, 255, 0.8)';
-      else if (currentState === 'SPEAKING') glowColor = 'rgba(255, 230, 0, 0.85)';
-      else if (currentState === 'THINKING') glowColor = 'rgba(192, 132, 252, 0.9)';
-
-      ctx!.strokeStyle = glowColor;
-      ctx!.lineWidth = 2 + level * 6;
-      ctx!.shadowColor = glowColor;
-      ctx!.shadowBlur = 15 + level * 30;
-      ctx!.stroke();
-      ctx!.restore();
+      // ctx!.save();
+      // ctx!.beginPath();
+      // ctx!.arc(centerX, centerY, blobRadius, 0, Math.PI * 2);
+      // 
+      // let glowColor = 'rgba(45, 156, 219, 0.1)';
+      // if (currentState === 'LISTENING') glowColor = 'rgba(0, 240, 255, 0.3)';
+      // else if (currentState === 'SPEAKING') glowColor = 'transparent';
+      // else if (currentState === 'THINKING') glowColor = 'rgba(192, 132, 252, 0.3)';
+      // 
+      // ctx!.strokeStyle = glowColor;
+      // ctx!.lineWidth = 1;
+      // ctx!.shadowColor = glowColor;
+      // ctx!.shadowBlur = 5;
+      // ctx!.stroke();
+      // ctx!.restore();
     }
 
     gsap.ticker.add(draw);
@@ -189,7 +176,7 @@ export const JarvisBlobCanvas: React.FC<JarvisBlobCanvasProps> = ({ state, audio
 
   return (
     <div className="jarvis-canvas-wrapper">
-      <canvas ref={canvasRef} className="jarvis-canvas" />
+      <canvas ref={canvasRef} className={`jarvis-canvas orb-${state.toLowerCase()}`} />
     </div>
   );
 };
