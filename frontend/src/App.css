@@ -10,6 +10,21 @@
   box-sizing: border-box;
   overflow: hidden;
   background: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.75) 0%, rgba(3, 7, 18, 0.95) 100%);
+
+  /* ===== JARVIS ORB SIZE CONTROLS (edit these to resize) ===== */
+  --orb-default-width: 360px;
+  /* Default card width */
+  --orb-default-height: 55vh;
+  /* Default card height */
+  --orb-default-max-height: 400px;
+  /* Default card max-height */
+  --orb-hover-width: 600px;
+  /* Hovered card width */
+  --orb-hover-height: 70vh;
+  /* Hovered card height */
+  --orb-hover-max-height: 600px;
+  /* Hovered card max-height */
+  /* ============================================================ */
 }
 
 /* Frameless Electron windows need their own basic controls. */
@@ -67,9 +82,9 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 520px;
-  height: 80vh;
-  max-height: 640px;
+  max-width: var(--orb-default-width);
+  height: var(--orb-default-height);
+  max-height: var(--orb-default-max-height);
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -82,14 +97,14 @@
     0 0 30px rgba(0, 240, 255, 0.1),
     inset 0 1px 1px rgba(255, 255, 255, 0.1);
   position: relative;
-  overflow: visible;
+  overflow: hidden;
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .jarvis-container:not(.disable-hover):hover {
-  max-width: 900px;
-  height: 90vh;
-  max-height: 850px;
+  max-width: var(--orb-hover-width);
+  height: var(--orb-hover-height);
+  max-height: var(--orb-hover-max-height);
 }
 
 /* Header */
@@ -220,11 +235,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 120px;
+  min-height: 80px;
 }
 
 .jarvis-container:not(.disable-hover):hover .jarvis-blob-wrapper {
-  min-height: 280px;
+  min-height: 180px;
 }
 
 .jarvis-canvas-wrapper {
@@ -438,60 +453,16 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-}
-
-.mic-button {
-  position: relative;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  color: #00f0ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  outline: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  flex-shrink: 0;
-}
-
-.mic-button:hover {
-  transform: scale(1.08);
-  border-color: #ffffff;
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
-}
-
-.mic-button.active {
-  background: linear-gradient(135deg, #00f0ff 0%, #0080ff 100%);
-  color: #040d1a;
-  border-color: #ffffff;
-  box-shadow: 0 0 30px rgba(0, 240, 255, 0.8);
-  animation: mic-pulse 1.2s infinite alternate;
-}
-
-@keyframes mic-pulse {
-  0% {
-    transform: scale(1);
-  }
-
-  100% {
-    transform: scale(1.12);
-  }
-}
-
-.mic-icon {
-  width: 24px;
-  height: 24px;
-  z-index: 2;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* Input Form */
 .input-form {
   display: flex;
   flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
   gap: 8px;
   background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -507,6 +478,7 @@
 
 .text-input {
   flex: 1;
+  min-width: 0;
   background: transparent;
   border: none;
   outline: none;
@@ -520,6 +492,7 @@
 }
 
 .send-button {
+  flex-shrink: 0;
   background: linear-gradient(135deg, #00f0ff 0%, #7700f7 100%);
   border: none;
   outline: none;
@@ -689,24 +662,58 @@
 
 /* Animations for Aura */
 @keyframes pet-pulse-idle {
-  0% { transform: scale(0.9); opacity: 0.4; }
-  50% { transform: scale(1.1); opacity: 0.7; }
-  100% { transform: scale(0.9); opacity: 0.4; }
+  0% {
+    transform: scale(0.9);
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(0.9);
+    opacity: 0.4;
+  }
 }
 
 @keyframes pet-pulse-listening {
-  0% { transform: scale(0.95); opacity: 0.6; filter: blur(20px); }
-  100% { transform: scale(1.25); opacity: 0.95; filter: blur(30px); }
+  0% {
+    transform: scale(0.95);
+    opacity: 0.6;
+    filter: blur(20px);
+  }
+
+  100% {
+    transform: scale(1.25);
+    opacity: 0.95;
+    filter: blur(30px);
+  }
 }
 
 @keyframes pet-pulse-thinking {
-  0% { transform: rotate(0deg) scale(1); filter: hue-rotate(0deg); }
-  100% { transform: rotate(360deg) scale(1.1); filter: hue-rotate(360deg); }
+  0% {
+    transform: rotate(0deg) scale(1);
+    filter: hue-rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg) scale(1.1);
+    filter: hue-rotate(360deg);
+  }
 }
 
 @keyframes pet-pulse-speaking {
-  0% { transform: scale(1); opacity: 0.7; }
-  100% { transform: scale(1.2); opacity: 0.95; }
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1.2);
+    opacity: 0.95;
+  }
 }
 
 /* Spline frame dimensions */
@@ -742,8 +749,8 @@
   color: #fff;
   font-size: 0.85rem;
   line-height: 1.4;
-  box-shadow: 
-    0 10px 25px rgba(0, 0, 0, 0.5), 
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.5),
     0 0 15px rgba(0, 240, 255, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   display: flex;
@@ -833,12 +840,21 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes bubble-fade-in {
-  from { opacity: 0; transform: translate3d(-50%, 10px, 0) scale(0.95); }
-  to { opacity: 1; transform: translate3d(-50%, 0, 0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translate3d(-50%, 10px, 0) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0) scale(1);
+  }
 }
 
 /* Fallback SVG animations */
@@ -860,9 +876,17 @@
 }
 
 @keyframes robot-float {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(1deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
 }
 
 .shadow-ellipse {
@@ -871,9 +895,20 @@
 }
 
 @keyframes shadow-scale {
-  0% { transform: scale(1); opacity: 0.4; }
-  50% { transform: scale(0.8); opacity: 0.2; }
-  100% { transform: scale(1); opacity: 0.4; }
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: scale(0.8);
+    opacity: 0.2;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
 }
 
 .thruster-glow {
@@ -882,8 +917,15 @@
 }
 
 @keyframes thruster-pulse {
-  0% { transform: scaleY(0.9) scaleX(0.95); opacity: 0.7; }
-  100% { transform: scaleY(1.25) scaleX(1.05); opacity: 1; }
+  0% {
+    transform: scaleY(0.9) scaleX(0.95);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scaleY(1.25) scaleX(1.05);
+    opacity: 1;
+  }
 }
 
 .standard-eyes ellipse {
@@ -892,8 +934,16 @@
 }
 
 @keyframes eye-blink {
-  0%, 90%, 100% { transform: scaleY(1); }
-  95% { transform: scaleY(0.1); }
+
+  0%,
+  90%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  95% {
+    transform: scaleY(0.1);
+  }
 }
 
 .thinking-eyes {
@@ -902,8 +952,13 @@
 }
 
 @keyframes thinking-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .antenna-tip {
@@ -911,8 +966,14 @@
 }
 
 @keyframes antenna-flash {
-  0% { opacity: 0.6; }
-  100% { opacity: 1; filter: brightness(1.3); }
+  0% {
+    opacity: 0.6;
+  }
+
+  100% {
+    opacity: 1;
+    filter: brightness(1.3);
+  }
 }
 
 /* Click indicator badge for the pet */
@@ -935,8 +996,13 @@
 }
 
 @keyframes mic-badge-pulse {
-  from { transform: scale(1); }
-  to { transform: scale(1.15); }
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.15);
+  }
 }
 
 /* Hide Spline Logo / Watermark link */

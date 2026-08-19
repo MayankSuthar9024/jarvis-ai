@@ -90,7 +90,7 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({
         )}
       </main>
 
-      {/* Bottom Interactive Controls (Mic Button, Text Input, Dialogue Display) */}
+        {/* Bottom Interactive Controls (Text Input and Dialogue Display) */}
       <section className="jarvis-controls-section" onClick={(e) => e.stopPropagation()}>
         {/* Dialogue Box */}
         {(transcript || response) && (
@@ -111,14 +111,6 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({
         )}
 
         <div className="controls-bar">
-          <button
-            className={`mic-button ${state === 'LISTENING' ? 'active' : ''}`}
-            onClick={onMicToggle}
-            title={state === 'LISTENING' ? 'Stop Listening' : 'Start Listening'}
-          >
-            🎤
-          </button>
-
           <form className="input-form" onSubmit={handleTextSubmit}>
             <input
               type="text"
@@ -135,4 +127,3 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({
     </div>
   );
 };
-
