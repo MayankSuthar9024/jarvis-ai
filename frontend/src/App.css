@@ -9,7 +9,7 @@
   padding: 16px;
   box-sizing: border-box;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.75) 0%, rgba(3, 7, 18, 0.95) 100%);
+  background: transparent;
 
   /* ===== JARVIS ORB SIZE CONTROLS (edit these to resize) ===== */
   --orb-default-width: 360px;
@@ -25,6 +25,21 @@
   --orb-hover-max-height: 600px;
   /* Hovered card max-height */
   /* ============================================================ */
+}
+
+.spline-background {
+  position: fixed;
+  top: -40%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.spline-background canvas {
+  pointer-events: none !important;
 }
 
 /* Frameless Electron windows need their own basic controls. */

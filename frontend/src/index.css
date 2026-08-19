@@ -61,33 +61,15 @@
 
 body {
   margin: 0;
-  background-color: var(--bg);
+  background-color: #030712;
 }
 
 body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -2;
-  background-image: url('./image/jarvisbackground1.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  display: none;
 }
 
 body::after {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  pointer-events: none;
+  display: none;
 }
 
 h1,

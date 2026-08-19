@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import Spline from '@splinetool/react-spline';
 import { JarvisBlobUI } from './components/JarvisBlobUI';
 import { AboutPage } from './components/AboutPage';
 import { JarvisPet } from './components/JarvisPet';
@@ -81,6 +82,10 @@ function App() {
 
   return (
     <div className="app-container" style={{ position: 'relative' }}>
+      <div className="spline-background" aria-hidden="true">
+        <Spline scene="https://prod.spline.design/c5gTKTrA18MmwCWJ/scene.splinecode" />
+      </div>
+
       {electronAPI && <div className="window-drag-region" aria-hidden="true" />}
 
       {electronAPI && (
