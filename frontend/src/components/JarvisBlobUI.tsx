@@ -1,63 +1,37 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, type FormEvent } from 'react';
 import { JarvisBlobCanvas } from './JarvisBlobCanvas';
-import { JarvisVoiceController, type AssistantState } from '../utils/JarvisVoiceController';
+import type { AssistantState } from '../utils/JarvisVoiceController';
+
 export interface JarvisBlobUIProps {
   settings?: {
     showBlob: boolean;
     hoverEnabled: boolean;
     equalizerEnabled: boolean;
   };
+  state: AssistantState;
+  audioLevel: number;
+  transcript: string;
+  response: string;
+  onMicToggle: () => void;
+  onSubmitQuery: (text: string) => void;
 }
 
-export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({ settings }) => {
-  const [state, setState] = useState<AssistantState>('IDLE');
-  const [audioLevel, setAudioLevel] = useState<number>(0);
-  const [transcript, setTranscript] = useState<string>('');
-  const [lastResponse, setLastResponse] = useState<string>(
-    'Hello, sir. I am JARVIS. Click the microphone or select a prompt below to interact.'
-  );
+export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({
+  settings,
+  state,
+  audioLevel,
+  transcript,
+  response,
+  onMicToggle,
+  onSubmitQuery,
+}) => {
   const [inputText, setInputText] = useState<string>('');
 
-  const controllerRef = useRef<JarvisVoiceController | null>(null);
-
-  useEffect(() => {
-    const controller = new JarvisVoiceController({
-      onStateChange: (newState) => setState(newState),
-      onTranscript: (text) => setTranscript(text),
-      onResponse: (resp) => setLastResponse(resp),
-      onAudioLevel: (lvl) => setAudioLevel(lvl),
-    });
-
-    controllerRef.current = controller;
-
-    return () => {
-      controller.stopSpeaking();
-      controller.stopListening();
-    };
-  }, []);
-
-  const handleMicToggle = () => {
-    if (!controllerRef.current) return;
-    if (state === 'LISTENING') {
-      controllerRef.current.stopListening();
-    } else {
-      controllerRef.current.startListening();
-    }
-  };
-
-  const handlePresetQuery = (query: string) => {
-    if (!controllerRef.current) return;
-    setTranscript(query);
-    controllerRef.current.processUserQuery(query);
-  };
-
-  const handleTextSubmit = (e: React.FormEvent) => {
+  const handleTextSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() || !controllerRef.current) return;
-    const text = inputText.trim();
+    if (!inputText.trim()) return;
+    onSubmitQuery(inputText.trim());
     setInputText('');
-    setTranscript(text);
-    controllerRef.current.processUserQuery(text);
   };
 
   const getStateBadgeClass = () => {
@@ -77,7 +51,7 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({ settings }) => {
     <div
       className={`jarvis-container ${settings?.hoverEnabled !== false ? '' : 'disable-hover'}`}
       style={{ cursor: 'pointer' }}
-      onClick={handleMicToggle}
+      onClick={onMicToggle}
       title={state === 'LISTENING' ? 'Stop Listening' : 'Click to Speak'}
     >
       {/* Center Blob Container with Circular Background Sampling */}
@@ -118,10 +92,28 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({ settings }) => {
 
       {/* Bottom Interactive Controls (Mic Button, Text Input, Dialogue Display) */}
       <section className="jarvis-controls-section" onClick={(e) => e.stopPropagation()}>
+        {/* Dialogue Box */}
+        {(transcript || response) && (
+          <div className="response-card">
+            {transcript && (
+              <div className="user-speech">
+                <span className="speech-label">You:</span>
+                {transcript}
+              </div>
+            )}
+            {response && (
+              <div className="jarvis-speech">
+                <span className="speech-label">Jarvis:</span>
+                {response}
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="controls-bar">
           <button
             className={`mic-button ${state === 'LISTENING' ? 'active' : ''}`}
-            onClick={handleMicToggle}
+            onClick={onMicToggle}
             title={state === 'LISTENING' ? 'Stop Listening' : 'Start Listening'}
           >
             🎤
@@ -143,3 +135,4 @@ export const JarvisBlobUI: React.FC<JarvisBlobUIProps> = ({ settings }) => {
     </div>
   );
 };
+

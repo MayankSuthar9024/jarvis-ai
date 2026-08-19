@@ -3,7 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev": "npm --prefix frontend run dev",
-    "build": "npm --prefix frontend run build"
+    "dev": "npm --prefix frontend run app",
+    "web": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "desktop:build": "npm --prefix frontend run dist",
+    "desktop:dir": "npm --prefix frontend run pack"
   }
 }

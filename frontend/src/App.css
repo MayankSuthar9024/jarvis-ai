@@ -12,6 +12,55 @@
   background: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.75) 0%, rgba(3, 7, 18, 0.95) 100%);
 }
 
+/* Frameless Electron windows need their own basic controls. */
+.window-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+}
+
+.window-drag-region {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  z-index: 9999;
+  -webkit-app-region: drag;
+}
+
+.window-controls button {
+  width: 32px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font: 18px/1 system-ui, sans-serif;
+  -webkit-app-region: no-drag;
+}
+
+.window-controls button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.window-controls .window-close:hover {
+  background: #c42b2b;
+}
+
+.settings-wrapper {
+  position: absolute;
+  top: 24px;
+  right: 112px;
+  z-index: 100;
+  -webkit-app-region: no-drag;
+}
+
 .jarvis-container {
   display: flex;
   flex-direction: column;
@@ -535,6 +584,7 @@
   user-select: none;
   transition: transform 0.2s ease, background 0.2s ease;
   overflow: hidden;
+  -webkit-app-region: no-drag;
 }
 
 .jarvis-header-glass:hover {
@@ -563,4 +613,397 @@
   100% {
     left: 200%;
   }
+}
+
+/* Floating Pet Styles */
+.jarvis-pet-container {
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.05s linear;
+}
+
+.jarvis-pet-container.dragging {
+  cursor: grabbing;
+}
+
+.jarvis-pet-container.dragging .spline-pet-frame {
+  pointer-events: none;
+}
+
+.pet-body-wrapper {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.pet-body-wrapper:hover {
+  transform: scale(1.08);
+}
+
+/* Aura Glow Base placed behind the robot */
+.pet-aura {
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  z-index: -1;
+  filter: blur(25px);
+  opacity: 0.65;
+  transition: all 0.5s ease;
+}
+
+.pet-aura-idle {
+  background: radial-gradient(circle, rgba(148, 163, 184, 0.6) 0%, rgba(30, 41, 59, 0) 70%);
+  animation: pet-pulse-idle 4s ease-in-out infinite;
+}
+
+.pet-aura-listening {
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.9) 0%, rgba(0, 128, 255, 0.2) 60%, rgba(0, 0, 0, 0) 100%);
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.5);
+  animation: pet-pulse-listening 1.2s alternate infinite ease-in-out;
+}
+
+.pet-aura-thinking {
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.9) 0%, rgba(119, 0, 247, 0.2) 60%, rgba(0, 0, 0, 0) 100%);
+  box-shadow: 0 0 35px rgba(192, 132, 252, 0.5);
+  animation: pet-pulse-thinking 2s infinite linear;
+}
+
+.pet-aura-speaking {
+  background: radial-gradient(circle, rgba(255, 230, 0, 0.95) 0%, rgba(255, 140, 0, 0.2) 60%, rgba(0, 0, 0, 0) 100%);
+  box-shadow: 0 0 35px rgba(255, 230, 0, 0.5);
+  animation: pet-pulse-speaking 0.8s alternate infinite ease-in-out;
+}
+
+/* Animations for Aura */
+@keyframes pet-pulse-idle {
+  0% { transform: scale(0.9); opacity: 0.4; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+  100% { transform: scale(0.9); opacity: 0.4; }
+}
+
+@keyframes pet-pulse-listening {
+  0% { transform: scale(0.95); opacity: 0.6; filter: blur(20px); }
+  100% { transform: scale(1.25); opacity: 0.95; filter: blur(30px); }
+}
+
+@keyframes pet-pulse-thinking {
+  0% { transform: rotate(0deg) scale(1); filter: hue-rotate(0deg); }
+  100% { transform: rotate(360deg) scale(1.1); filter: hue-rotate(360deg); }
+}
+
+@keyframes pet-pulse-speaking {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(1.2); opacity: 0.95; }
+}
+
+/* Spline frame dimensions */
+.spline-pet-frame {
+  width: 140px;
+  height: 140px;
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Speech Bubble container */
+.pet-speech-bubble-container {
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 250px;
+  pointer-events: auto;
+  z-index: 10000;
+  animation: bubble-fade-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pet-speech-bubble {
+  position: relative;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  padding: 14px 34px 14px 16px;
+  color: #fff;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.5), 
+    0 0 15px rgba(0, 240, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.pet-speech-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: rgba(15, 23, 42, 0.85) transparent;
+  display: block;
+  width: 0;
+}
+
+.pet-speech-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.pet-speech-close:hover {
+  color: #ff5555;
+}
+
+.pet-speech-user {
+  color: #38bdf8;
+  font-style: italic;
+}
+
+.pet-speech-jarvis {
+  color: #f1f5f9;
+  font-weight: 500;
+}
+
+.bubble-label {
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+.pet-speech-user .bubble-label {
+  color: #00f0ff;
+}
+
+.pet-speech-jarvis .bubble-label {
+  color: #ffe600;
+}
+
+/* Loading Spinners */
+.pet-loading-spinner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.3);
+}
+
+.spinner-core {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(0, 240, 255, 0.2);
+  border-radius: 50%;
+  border-top-color: #00f0ff;
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bubble-fade-in {
+  from { opacity: 0; transform: translate3d(-50%, 10px, 0) scale(0.95); }
+  to { opacity: 1; transform: translate3d(-50%, 0, 0) scale(1); }
+}
+
+/* Fallback SVG animations */
+.fallback-robot-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fallback-robot-svg {
+  overflow: visible;
+}
+
+.robot-floating-group {
+  animation: robot-float 3s ease-in-out infinite;
+  transform-origin: center 50px;
+}
+
+@keyframes robot-float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.shadow-ellipse {
+  animation: shadow-scale 3s ease-in-out infinite;
+  transform-origin: 50px 85px;
+}
+
+@keyframes shadow-scale {
+  0% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(0.8); opacity: 0.2; }
+  100% { transform: scale(1); opacity: 0.4; }
+}
+
+.thruster-glow {
+  animation: thruster-pulse 0.4s ease-in-out infinite alternate;
+  transform-origin: 50px 70px;
+}
+
+@keyframes thruster-pulse {
+  0% { transform: scaleY(0.9) scaleX(0.95); opacity: 0.7; }
+  100% { transform: scaleY(1.25) scaleX(1.05); opacity: 1; }
+}
+
+.standard-eyes ellipse {
+  animation: eye-blink 5s ease-in-out infinite;
+  transform-origin: center 34px;
+}
+
+@keyframes eye-blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+.thinking-eyes {
+  animation: thinking-spin 1.5s infinite linear;
+  transform-origin: 50px 34px;
+}
+
+@keyframes thinking-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.antenna-tip {
+  animation: antenna-flash 1s infinite alternate;
+}
+
+@keyframes antenna-flash {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; filter: brightness(1.3); }
+}
+
+/* Click indicator badge for the pet */
+.pet-state-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #00f0ff;
+  color: #000;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  box-shadow: 0 4px 10px rgba(0, 240, 255, 0.4);
+  border: 2px solid #fff;
+  animation: mic-badge-pulse 1s infinite alternate;
+}
+
+@keyframes mic-badge-pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.15); }
+}
+
+/* Hide Spline Logo / Watermark link */
+.spline-pet-frame a,
+.spline-pet-frame #spline-logo,
+a[href*="spline.design"],
+a[href*="spline"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Electron Native Drag & Interactive Regions */
+.electron-draggable {
+  -webkit-app-region: drag !important;
+}
+
+.electron-non-draggable,
+.pet-hover-controls,
+.pet-control-btn {
+  -webkit-app-region: no-drag !important;
+}
+
+/* Hover Controls Overlay */
+.pet-hover-controls {
+  position: absolute;
+  top: 0px;
+  display: flex;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 6px 12px;
+  border-radius: 20px;
+  opacity: 0;
+  transform: translateY(-5px);
+  pointer-events: none;
+  z-index: 10000;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.jarvis-pet-container:hover .pet-hover-controls {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.pet-control-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  padding: 0;
+}
+
+.pet-control-btn:hover {
+  background: rgba(0, 240, 255, 0.25);
+  transform: scale(1.1);
 }

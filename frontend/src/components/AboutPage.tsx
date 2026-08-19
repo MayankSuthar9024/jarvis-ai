@@ -1,6 +1,8 @@
-import React from 'react';
+type AboutPageProps = {
+  onBack: () => void;
+};
 
-export const AboutPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+export function AboutPage({ onBack }: AboutPageProps) {
   return (
     <div style={{
       display: 'flex',
@@ -17,7 +19,7 @@ export const AboutPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       width: '100%'
     }}>
       <h1 style={{ fontSize: '4rem', marginBottom: '1.5rem', letterSpacing: '8px', textShadow: '0 4px 30px rgba(255,255,255,0.4)', fontWeight: 'bold' }}>ABOUT JARVIS</h1>
-      
+
       <div style={{
         background: 'rgba(255, 255, 255, 0.05)',
         border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -30,22 +32,22 @@ export const AboutPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           JARVIS is an advanced artificial intelligence assistant designed for an unparalleled user experience.
           Built with cutting-edge web technologies, it features dynamic visualizations and voice interaction capabilities to seamlessly assist you.
         </p>
-        
+
         <p style={{ fontSize: '1.1rem', lineHeight: '1.6', color: 'rgba(255,255,255,0.6)' }}>
-          System Version: 2.4.1 <br/>
-          Core Modules: Active <br/>
+          System Version: 2.4.1 <br />
+          Core Modules: Active <br />
           Neural Net: Synchronized
         </p>
       </div>
 
-      <button 
+      <button
         onClick={onBack}
         style={{
           marginTop: '3rem',
           padding: '14px 32px',
           background: 'rgba(255,255,255,0.1)',
           border: '1px solid rgba(255,255,255,0.3)',
-          borderRadius: '40px',
+          borderRadius: '12px',
           color: '#fff',
           fontSize: '1.1rem',
           letterSpacing: '1px',
@@ -77,4 +79,4 @@ export const AboutPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       </style>
     </div>
   );
-};
+}

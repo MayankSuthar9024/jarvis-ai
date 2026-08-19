@@ -53,7 +53,6 @@ export const JarvisBlobCanvas: React.FC<JarvisBlobCanvasProps> = ({ state, audio
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // ---- USER'S EXACT BLOB CODE ----
     const twoPi = Math.PI * 2;
     const sizeObj = {
       windowWidth: 800,
@@ -114,13 +113,9 @@ export const JarvisBlobCanvas: React.FC<JarvisBlobCanvasProps> = ({ state, audio
       ctx!.globalCompositeOperation = "source-over";
       ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
 
-      // Clip to circle (blob-sized circular background)
       const centerX = sizeObj.windowWidth / 2;
       const centerY = sizeObj.windowHeight / 2;
-      const currentState = stateRef.current;
-      const level = audioLevelRef.current;
       const baseRadius = Math.min(sizeObj.windowWidth, sizeObj.windowHeight) * 0.25;
-
       const blobRadius = baseRadius;
 
       ctx!.save();
@@ -128,11 +123,9 @@ export const JarvisBlobCanvas: React.FC<JarvisBlobCanvasProps> = ({ state, audio
       ctx!.arc(centerX, centerY, blobRadius, 0, Math.PI * 2);
       ctx!.clip();
 
-      // Dark base inside the clipped circle
       ctx!.fillStyle = '#080613';
       ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
 
-      // Draw particles exactly as the user's code
       particleArray.forEach((particle) => {
         const radGrad = ctx!.createRadialGradient(
           particle.x1, particle.y1, particle.r1,
