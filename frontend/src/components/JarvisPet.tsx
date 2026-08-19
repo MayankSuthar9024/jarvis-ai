@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Spline from '@splinetool/react-spline';
 import type { AssistantState } from '../utils/JarvisVoiceController';
+import { hideSplineWatermark } from '../utils/hideSplineWatermark';
 
 interface JarvisPetProps {
   state: AssistantState;
@@ -48,7 +49,7 @@ export const JarvisPet: React.FC<JarvisPetProps> = ({
   // Update position on window resize to keep inside bounds (only when in web/pointer dragging mode)
   useEffect(() => {
     if (isElectron && companionMode) return;
-    
+
     const handleResize = () => {
       setPosition((prev) => {
         const maxX = window.innerWidth - 180;
@@ -66,14 +67,14 @@ export const JarvisPet: React.FC<JarvisPetProps> = ({
   // Pointer dragging handlers (disabled in Electron companion mode, using native OS drag instead)
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (isElectron && companionMode) return;
-    
+
     // Only drag with left click / primary touch
     if (e.button !== 0) return;
 
     setIsDragging(true);
     dragStartRef.current = { ...position };
     pointerStartRef.current = { x: e.clientX, y: e.clientY };
-    
+
     if (containerRef.current) {
       containerRef.current.setPointerCapture(e.pointerId);
     }
@@ -110,7 +111,7 @@ export const JarvisPet: React.FC<JarvisPetProps> = ({
     // Check if it was a quick click rather than a drag
     const deltaX = Math.abs(e.clientX - pointerStartRef.current.x);
     const deltaY = Math.abs(e.clientY - pointerStartRef.current.y);
-    
+
     if (deltaX < 5 && deltaY < 5) {
       // Toggle microphone on click
       onMicToggle();
@@ -135,9 +136,8 @@ export const JarvisPet: React.FC<JarvisPetProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`jarvis-pet-container ${isDragging ? 'dragging' : ''} ${
-        isNativeDrag ? 'electron-draggable' : ''
-      }`}
+      className={`jarvis-pet-container ${isDragging ? 'dragging' : ''} ${isNativeDrag ? 'electron-draggable' : ''
+        }`}
       style={{
         transform: isNativeDrag ? 'none' : `translate3d(${position.x}px, ${position.y}px, 0)`,
         position: isNativeDrag ? 'relative' : 'fixed',
@@ -173,12 +173,12 @@ export const JarvisPet: React.FC<JarvisPetProps> = ({
       )}
 
       {/* Main Companion Body */}
-      <div 
-        className={`pet-body-wrapper ${state.toLowerCase()}`} 
+      <div
+        className={`pet-body-wrapper ${state.toLowerCase()}`}
         title={isNativeDrag ? "Drag anywhere to move!" : "Click to speak / Drag to move!"}
       >
         {/* State Aura Glow Base */}
-        <div 
+        <div
           className={`pet-aura ${getAuraColorClass()}`}
           style={{ transform: `scale(${1 + audioLevel * 0.3})` }}
         />
@@ -187,8 +187,11 @@ export const JarvisPet: React.FC<JarvisPetProps> = ({
         {webglSupported && !splineError ? (
           <div className="spline-pet-frame">
             <Spline
-              scene="https://prod.spline.design/9zBMf6raVSXKyHOG/scene.splinecode"
-              onLoad={() => setSplineLoaded(true)}
+              scene="https://prod.spline.design/S-fl357gy5yUpubr/scene.splinecode"
+              onLoad={(application) => {
+                hideSplineWatermark(application);
+                setSplineLoaded(true);
+              }}
               onError={() => {
                 setSplineError(true);
                 setSplineLoaded(false);
@@ -265,7 +268,7 @@ export const JarvisPet: React.FC<JarvisPetProps> = ({
                   stroke={state === 'LISTENING' ? '#00f0ff' : state === 'THINKING' ? '#c084fc' : state === 'SPEAKING' ? '#ffe600' : 'rgba(255,255,255,0.3)'}
                   strokeWidth="2"
                 />
-                
+
                 {/* Neck */}
                 <rect
                   x="47"
@@ -349,7 +352,7 @@ export const JarvisPet: React.FC<JarvisPetProps> = ({
             </svg>
           </div>
         )}
-        
+
         {/* Floating Indicator (e.g. mic icon when listening) */}
         {state === 'LISTENING' && !companionMode && (
           <div className="pet-state-badge listening">
@@ -360,5 +363,3 @@ export const JarvisPet: React.FC<JarvisPetProps> = ({
     </div>
   );
 };
-
-
