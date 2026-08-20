@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import Spline from '@splinetool/react-spline';
 import { JarvisBlobUI } from './components/JarvisBlobUI';
 import { AboutPage } from './components/AboutPage';
-import { JarvisPet } from './components/JarvisPet';
 import { JarvisVoiceController, type AssistantState } from './utils/JarvisVoiceController';
 import { hideSplineWatermark } from './utils/hideSplineWatermark';
 import './App.css';
@@ -11,8 +10,6 @@ export interface JarvisSettings {
   showBlob: boolean;
   hoverEnabled: boolean;
   equalizerEnabled: boolean;
-  showPet: boolean;
-  companionMode: boolean;
 }
 
 function App() {
@@ -22,8 +19,6 @@ function App() {
     showBlob: true,
     hoverEnabled: true,
     equalizerEnabled: true,
-    showPet: true,
-    companionMode: false,
   });
 
   // Shared Jarvis Voice Assistant State
@@ -49,13 +44,6 @@ function App() {
       controller.stopListening();
     };
   }, []);
-
-  // Notify Electron of companion mode window state changes
-  useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).electronAPI) {
-      (window as any).electronAPI.setCompanionMode(settings.companionMode);
-    }
-  }, [settings.companionMode]);
 
   const handleMicToggle = () => {
     if (!controllerRef.current) return;
@@ -111,8 +99,7 @@ function App() {
       ) : (
         <>
           {/* Top Left Header */}
-          {!settings.companionMode && (
-            <div
+          <div
               className="jarvis-header-glass"
               onClick={(e) => {
                 e.preventDefault();
@@ -136,8 +123,7 @@ function App() {
               title="About JARVIS"
             >
               <h1 style={{ margin: 0, color: '#fff', fontSize: '24px', letterSpacing: '2px', fontWeight: 'bold', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>JARVIS</h1>
-            </div>
-          )}
+          </div>
 
           {/* Settings Button (Top Right of App) */}
           <div className="settings-wrapper">
@@ -209,53 +195,20 @@ function App() {
                   </div>
                 </div>
 
-                {/* Section: Companion Robot */}
-                <div>
-                  <div style={{ fontWeight: 'bold', color: '#ffffffff', marginBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '6px', letterSpacing: '0.5px', marginTop: '10px' }}>COMPANION</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={settings.showPet}
-                        onChange={(e) => updateSetting('showPet', e.target.checked)}
-                      />
-                      Show 3D Robot Pet
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={settings.companionMode}
-                        onChange={(e) => updateSetting('companionMode', e.target.checked)}
-                      />
-                      Companion Only Mode
-                    </label>
-                  </div>
-                </div>
               </div>
             )}
           </div>
 
-          {!settings.companionMode && (
-            <JarvisBlobUI
-              settings={settings}
-              state={assistantState}
-              audioLevel={audioLevel}
-              transcript={transcript}
-              response={response}
-              onMicToggle={handleMicToggle}
-              onSubmitQuery={handleTextSubmit}
-            />
-          )}
+          <JarvisBlobUI
+            settings={settings}
+            state={assistantState}
+            audioLevel={audioLevel}
+            transcript={transcript}
+            response={response}
+            onMicToggle={handleMicToggle}
+            onSubmitQuery={handleTextSubmit}
+          />
 
-          {settings.showPet && (
-            <JarvisPet
-              state={assistantState}
-              audioLevel={audioLevel}
-              onMicToggle={handleMicToggle}
-              companionMode={settings.companionMode}
-              onToggleCompanionMode={() => updateSetting('companionMode', !settings.companionMode)}
-            />
-          )}
         </>
       )}
     </div>
